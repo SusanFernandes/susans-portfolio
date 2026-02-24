@@ -41,6 +41,7 @@ export default function Home() {
     setIsDark(!isDark)
   }
 
+  /*
   const handleChatSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!chatInput.trim()) return
@@ -52,6 +53,31 @@ export default function Home() {
     ]
     setChatMessages(newMessages)
     setChatInput("")
+  }
+  */
+
+  const handleChatSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!chatInput.trim()) return
+
+    const userMsg = { role: "user", content: chatInput }
+    setChatMessages((prev) => [...prev, userMsg])
+    setChatInput("")
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: chatInput }),
+      })
+
+      if (!res.ok) throw new Error("API error")
+
+      const data = await res.json()
+      setChatMessages((prev) => [...prev, { role: "assistant", content: data.response || "..." }])
+    } catch (err) {
+      setChatMessages((prev) => [...prev, { role: "assistant", content: "Sorry, something went wrong 😔" }])
+    }
   }
 
   return (
