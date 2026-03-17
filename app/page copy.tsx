@@ -1,19 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { useTheme } from "next-themes"
-import { projectsData } from "@/lib/projects"
-
+import ImageTrail from '@/components/ImageTrail'
 export default function Home() {
-  const router = useRouter()
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const [isDark, setIsDark] = useState(true)
   const [activeSection, setActiveSection] = useState("")
-  useEffect(() => {
-    setMounted(true)
-  }, [])
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string }>>([
     { role: "assistant", content: "Hi! How can I help you today?" },
@@ -21,6 +13,9 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("")
   const sectionsRef = useRef<(HTMLElement | null)[]>([])
 
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark)
+  }, [isDark])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -29,21 +24,10 @@ export default function Home() {
           if (entry.isIntersecting) {
             entry.target.classList.add("animate-fade-in-up")
             setActiveSection(entry.target.id)
-            
-            // Sync URL hash with the active section
-            if (typeof window !== "undefined") {
-              const hash = `#${entry.target.id}`
-              if (window.location.hash !== hash) {
-                window.history.replaceState(null, "", hash)
-              }
-            }
           }
         })
       },
-      { 
-        threshold: 0.2, 
-        rootMargin: "-20% 0px -40% 0px" // Focus on a specific region for active state
-      },
+      { threshold: 0.3, rootMargin: "0px 0px -20% 0px" },
     )
 
     sectionsRef.current.forEach((section) => {
@@ -53,24 +37,8 @@ export default function Home() {
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    // Make sure we scroll dynamically if the page is loaded with a hash
-    if (window.location.hash) {
-      setTimeout(() => {
-        const id = window.location.hash.replace("#", "")
-        const element = document.getElementById(id)
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" })
-          setActiveSection(id)
-          // Optionally add animation class directly
-          element.classList.add("animate-fade-in-up")
-        }
-      }, 300)
-    }
-  }, [])
-
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
+    setIsDark(!isDark)
   }
 
   /*
@@ -113,7 +81,37 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
+    <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
+      {/* Side ImageTrails for Intro Header */}
+      <div className="absolute top-0 left-0 w-[calc(50vw-400px)] h-screen z-0 overflow-hidden hidden lg:block">
+        <ImageTrail
+          items={[
+            '/1.png',
+            '/5.png',
+            '/6.png',
+            '/2.png',
+            '/3.png',
+            '/4.png',
+            '/7.png'
+          ]}
+          variant={4}
+        />
+      </div>
+      <div className="absolute top-0 right-0 w-[calc(50vw-400px)] h-screen z-0 overflow-hidden hidden lg:block">
+        <ImageTrail
+          items={[
+            '/1.png',
+            '/5.png',
+            '/6.png',
+            '/2.png',
+            '/3.png',
+            '/4.png',
+            '/7.png'
+          ]}
+          variant={4}
+        />
+      </div>
+
       <header className="fixed top-0 right-0 z-50 p-6 flex items-center gap-3">
         <button
           onClick={() => setIsChatOpen(!isChatOpen)}
@@ -134,7 +132,7 @@ export default function Home() {
           className="group p-3 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300"
           aria-label="Toggle theme"
         >
-          {mounted && theme === "dark" ? (
+          {isDark ? (
             <svg
               className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-300"
               fill="currentColor"
@@ -163,11 +161,7 @@ export default function Home() {
           {["intro", "experience", "projects", "achievements", "skills", "connect"].map((section) => (
             <button
               key={section}
-              onClick={() => {
-                document.getElementById(section)?.scrollIntoView({ behavior: "smooth" })
-                window.history.pushState(null, "", `#${section}`)
-                setActiveSection(section)
-              }}
+              onClick={() => document.getElementById(section)?.scrollIntoView({ behavior: "smooth" })}
               className={`w-2 h-8 rounded-full transition-all duration-500 ${
                 activeSection === section ? "bg-foreground" : "bg-muted-foreground/30 hover:bg-muted-foreground/60"
               }`}
@@ -180,7 +174,7 @@ export default function Home() {
       <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16">
         <header
           id="intro"
-          ref={(el) => { sectionsRef.current[0] = el }}
+          ref={(el) => (sectionsRef.current[0] = el)}
           className="min-h-screen flex items-center opacity-0"
         >
           <div className="grid lg:grid-cols-5 gap-12 sm:gap-16 w-full">
@@ -240,7 +234,7 @@ export default function Home() {
 
         <section
           id="experience"
-          ref={(el) => { sectionsRef.current[1] = el }}
+          ref={(el) => (sectionsRef.current[1] = el)}
           className="min-h-screen py-20 sm:py-32 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
@@ -312,26 +306,46 @@ export default function Home() {
 
         <section
           id="projects"
-          ref={(el) => { sectionsRef.current[2] = el }}
+          ref={(el) => (sectionsRef.current[2] = el)}
           className="min-h-screen py-20 sm:py-32 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <h2 className="text-3xl sm:text-4xl font-light">Featured Projects</h2>
-              <div className="text-sm text-muted-foreground font-mono">(Click on project to know more)</div>
-            </div>
+            <h2 className="text-3xl sm:text-4xl font-light">Featured Projects</h2>
 
             <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
-              {projectsData.map((project, index) => (
+              {[
+                {
+                  title: "ReFast — AI Research Companion",
+                  description:
+                    "AI platform for analyzing, summarizing, and comparing research papers using Retrieval-Augmented Generation (RAG). Implemented Google OAuth, chat memory, and cloud LLM inference.",
+                  tech: ["Next.js", "Supabase", "Crawl4AI", "ChromaDB"],
+                  github: "#",
+                  link: "#",
+                },
+                {
+                  title: "ResQ AI — Emergency Response Platform",
+                  description:
+                    "Agentic AI platform for assisting 112 emergency calls with real-time speech pipeline using Vosk. Features context-aware emergency classification and live caller location visualization.",
+                  tech: ["Next.js", "NLP", "Vosk", "ChromaDB", "MapBox"],
+                  github: "#",
+                  link: "#",
+                },
+                {
+                  title: "LifeAxis — Smart Healthcare Platform",
+                  description:
+                    "Healthcare platform connecting doctors, patients, and nurses. Built role-based dashboards with RBAC. Ranked Top 90 out of 10,000 in Google AI for Impact. Integrated AI assistant using Gemini API.",
+                  tech: ["Next.js", "Tailwind", "Gemini API", "RBAC"],
+                  github: "#",
+                  link: "#",
+                },
+              ].map((project, index) => (
                 <article
                   key={index}
-                  onClick={() => router.push(`/projects/${project.id}`)}
-                  className="group relative cursor-pointer p-6 sm:p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg"
+                  className="group relative p-6 sm:p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg"
                 >
                   <div className="absolute top-4 right-4 flex gap-2">
                     <Link
                       href={project.github}
-                      onClick={(e) => e.stopPropagation()}
                       className="p-2 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300 hover:bg-muted/50"
                       aria-label="View GitHub repository"
                     >
@@ -345,7 +359,6 @@ export default function Home() {
                     </Link>
                     <Link
                       href={project.link}
-                      onClick={(e) => e.stopPropagation()}
                       className="p-2 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300 hover:bg-muted/50"
                       aria-label="Visit project"
                     >
@@ -391,7 +404,7 @@ export default function Home() {
 
         <section
           id="achievements"
-          ref={(el) => { sectionsRef.current[3] = el }}
+          ref={(el) => (sectionsRef.current[3] = el)}
           className="py-20 sm:py-32 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
@@ -440,7 +453,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="skills" ref={(el) => { sectionsRef.current[4] = el }} className="py-20 sm:py-32 opacity-0">
+        <section id="skills" ref={(el) => (sectionsRef.current[4] = el)} className="py-20 sm:py-32 opacity-0">
           <div className="space-y-12 sm:space-y-16">
             <h2 className="text-3xl sm:text-4xl font-light">Technical Skills</h2>
 
@@ -477,7 +490,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="connect" ref={(el) => { sectionsRef.current[5] = el }} className="py-20 sm:py-32 opacity-0">
+        <section id="connect" ref={(el) => (sectionsRef.current[5] = el)} className="py-20 sm:py-32 opacity-0">
           <div className="grid lg:grid-cols-2 gap-12 sm:gap-16">
             <div className="space-y-6 sm:space-y-8">
               <h2 className="text-3xl sm:text-4xl font-light">Get In Touch</h2>
