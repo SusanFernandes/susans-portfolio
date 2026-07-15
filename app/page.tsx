@@ -215,16 +215,16 @@ export default function Home() {
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground font-mono">CURRENTLY</div>
                 <div className="space-y-2">
-                  <div className="text-foreground">Full Stack Developer</div>
-                  <div className="text-muted-foreground">@ SAT Club</div>
-                  <div className="text-xs text-muted-foreground">Dec 2025 — Present</div>
+                  <div className="text-foreground">Junior AI Engineer</div>
+                  <div className="text-muted-foreground">@ Avataar.ai</div>
+                  <div className="text-xs text-muted-foreground">June 2026 — Present</div>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground font-mono">FOCUS</div>
                 <div className="flex flex-wrap gap-2">
-                  {["Next.js", "React", "AI/ML", "TypeScript", "Supabase"].map((skill) => (
+                  {["Internal Agents", "Fine-tuning", "AI/ML", "TypeScript", "Python"].map((skill) => (
                     <span
                       key={skill}
                       className="px-3 py-1 text-xs border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
@@ -246,14 +246,22 @@ export default function Home() {
           <div className="space-y-12 sm:space-y-16">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <h2 className="text-3xl sm:text-4xl font-light">Experience</h2>
-              <div className="text-sm text-muted-foreground font-mono">2023 — 2025</div>
+              <div className="text-sm text-muted-foreground font-mono">2023 — 2026</div>
             </div>
 
             <div className="space-y-8 sm:space-y-12">
               {[
                 {
-                  year: "2025",
-                  role: "Full Stack Developer",
+                  year: "2026",
+                  role: "Junior AI Engineer",
+                  company: "Avataar.ai",
+                  description:
+                    "Building and iterating on internal agents. Working on model fine-tuning to improve reliability and task performance across product workflows.",
+                  tech: ["Agents", "Fine-tuning", "Python", "AI/ML"],
+                },
+                {
+                  year: "2025-2026",
+                  role: "Full Stack Developer Intern",
                   company: "SAT Club",
                   description:
                     "Redesigned UI with complex state-driven components. Implemented SAT-style Eliminator feature. Built Operations page with secure Markdown + LaTeX rendering using KaTeX and DOM sanitization.",
